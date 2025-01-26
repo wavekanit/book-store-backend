@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"book-store-backend/src/config"
-	"book-store-backend/src/models"
+	"github.com/wavekanit/book-store-backend/src/config"
+	"github.com/wavekanit/book-store-backend/src/models"
 
 	"github.com/gofiber/fiber/v2"
 )

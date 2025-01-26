@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"book-store-backend/src/handlers"
+	"github.com/wavekanit/book-store-backend/src/handlers"
 
 	"github.com/gofiber/fiber/v2"
 )

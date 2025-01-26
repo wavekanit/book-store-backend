@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"book-store-backend/src/config"
-	"book-store-backend/src/routes"
+	"github.com/wavekanit/book-store-backend/src/config"
+	"github.com/wavekanit/book-store-backend/src/routes"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"

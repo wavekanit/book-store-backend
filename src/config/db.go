@@ -8,7 +8,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"book-store-backend/src/models"
+	"github.com/wavekanit/book-store-backend/src/models"
 )
 
 var DB *gorm.DB

@@ -1,4 +1,4 @@
-module book-store-backend
+module github.com/wavekanit/book-store-backend
 
 go 1.23.1
 
