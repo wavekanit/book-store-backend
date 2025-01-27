@@ -1,4 +1,4 @@
-package handlers
+package controllers
 
 import (
 	"github.com/wavekanit/book-store-backend/src/config"
