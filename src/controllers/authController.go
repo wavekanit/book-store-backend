@@ -2,7 +2,10 @@ package controllers
 
 import (
 	"log"
+	"os"
+	"time"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/wavekanit/book-store-backend/src/config"
 	"github.com/wavekanit/book-store-backend/src/models"
 	"golang.org/x/crypto/bcrypt"
@@ -11,7 +14,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func TestLogin(c *fiber.Ctx) error {
+func Login(c *fiber.Ctx) error {
 	var loginUser models.Users
 	if err := c.BodyParser(&loginUser); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -46,7 +49,31 @@ func TestLogin(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(fiber.Map{"message": "Login successful", "users": users, "user": loginUser})
+	// Generate JWT
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"username": loginUser.Username,
+		"exp":      time.Now().Add(time.Hour * 24).Unix(), // 24-hour expiration
+	})
+
+	tokenString, err := token.SignedString(jwtSecret)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not generate token"})
+	}
+
+	result = config.DB.Model(&users[0]).Update("token", tokenString)
+	if result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Could not update token",
+			"error":   result.Error.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{"message": "Login successful"})
 }
 
 func Register(c *fiber.Ctx) error {
@@ -56,10 +83,10 @@ func Register(c *fiber.Ctx) error {
 			"error": "cannot parse JSON",
 		})
 	}
-	
-	if newUser.Username == "" || newUser.Password == "" {
+
+	if newUser.Username == "" || newUser.Password == "" || newUser.Email == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Username and Password is required",
+			"error": "Fill All of the Fields",
 		})
 	}
 
@@ -80,5 +107,7 @@ func Register(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(fiber.Map{"message": "User created successfully", "user": newUser})
+	c.JSON(fiber.Map{"message": "User created successfully"})
+
+	return c.Next()
 }

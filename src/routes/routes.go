@@ -2,12 +2,18 @@ package routes
 
 import (
 	"github.com/wavekanit/book-store-backend/src/controllers"
+	"github.com/wavekanit/book-store-backend/src/middlewares"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func SetupRoutes(app *fiber.App) {
-	app.Get("/api/users", controllers.GetAllUsers)
-	app.Post("/api/login", controllers.TestLogin)
-	app.Post("/api/register", controllers.Register)
+	v1 := app.Group("/v1")
+
+	v1.Post("/api/login", controllers.Login)
+	v1.Post("/api/register", controllers.Register, controllers.Login)
+
+	protected := v1.Group("/").Use(middlewares.AuthenticateToken)
+	protected.Get("/api/users", controllers.GetAllUsers)
+
 }

@@ -8,4 +8,5 @@ type Users struct {
 	Password  string    `gorm:"type:text; not null" json:"password"`
 	Email     string    `gorm:"type:text; not null ;unique" json:"email"`
 	CreatedAt time.Time `gorm:"type:timestamp; autoCreateTime" json:"created_at"`
+	Token     string    `gorm:"-" json:"token"`
 }
