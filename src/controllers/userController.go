@@ -19,5 +19,5 @@ func GetAllUsers(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(fiber.Map{"data": users})
+	return c.JSON(fiber.Map{"data": users, "claims": c.Locals("user")})
 }
