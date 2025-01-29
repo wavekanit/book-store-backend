@@ -45,6 +45,20 @@ func AuthenticateToken(c *fiber.Ctx) error {
 		})
 	}
 
-	c.Locals("user", claims)
+	c.Locals("claims", claims)
+	c.Locals("auth_level", claims["auth_level"])
+	c.Locals("username", claims["username"])
 	return c.Next()
+}
+
+func CheckAuthLevel(level float64) fiber.Handler {
+    return func(c *fiber.Ctx) error {
+        authLevel := c.Locals("auth_level").(float64)
+        if authLevel < level {
+            return c.Status(http.StatusForbidden).JSON(fiber.Map{
+                "error": "You have no permission",
+            })
+        }
+        return c.Next()
+    }
 }

@@ -24,7 +24,7 @@ func ConnectDatabase() {
 	if dbURL == "" {
 		log.Fatal("DB_URL is not set in .env")
 	}
-
+	
 	// เชื่อมต่อฐานข้อมูลด้วย GORM
 	database, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
 	if err != nil {
