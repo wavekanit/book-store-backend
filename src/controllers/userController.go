@@ -1,23 +1,40 @@
 package controllers
 
 import (
-	"github.com/wavekanit/book-store-backend/src/config"
 	"github.com/wavekanit/book-store-backend/src/models"
+	"github.com/wavekanit/book-store-backend/src/services"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-// GetAllUsers ดึงข้อมูลผู้ใช้ทั้งหมดจากฐานข้อมูล
-func GetAllUsers(c *fiber.Ctx) error {
-	var users []models.Users
+type UserController struct {
+	UserService *services.UserService
+}
 
-	// Query ข้อมูลผู้ใช้ทั้งหมด
-	result := config.DB.Find(&users)
-	if result.Error != nil {
+func NewUserController(userService *services.UserService) *UserController {
+	return &UserController{UserService: userService}
+}
+
+func (uc *UserController) GetAllUsers(c *fiber.Ctx) error {
+	var users []models.Users
+	users, err := uc.UserService.GetAllUsers()
+	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": result.Error.Error(),
+			"error": "Failed to retrieve users",
 		})
 	}
 
-	return c.JSON(fiber.Map{"data": users, "claims": c.Locals("user")})
+	return c.JSON(fiber.Map{"message": "Users retrieved successfully", "data": users})
+}
+
+func (uc *UserController) GetUserByID(c *fiber.Ctx) error {
+	id := c.Params("id")
+	user, err := uc.UserService.GetUserByID(id)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "User not found",
+		})
+	}
+
+	return c.JSON(fiber.Map{"message": "User retrieved successfully", "data": user})
 }
