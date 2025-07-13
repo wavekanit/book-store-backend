@@ -1,21 +1,25 @@
 package middlewares
 
 import (
-	"log"
 	"net/http"
 	"os"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
-	"github.com/joho/godotenv"
 )
 
-func AuthenticateToken(c *fiber.Ctx) error {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
+type AuthMiddleware struct {
+	JWTSecret []byte
+}
 
+func NewAuthMiddleware() *AuthMiddleware {
+	return &AuthMiddleware{
+		JWTSecret: []byte(os.Getenv("JWT_SECRET")),
+	}
+}
+
+func (am *AuthMiddleware) AuthenticateToken(c *fiber.Ctx) error {
 	tokenString := c.Get("Authorization")
 	if tokenString == "" {
 		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
@@ -29,7 +33,7 @@ func AuthenticateToken(c *fiber.Ctx) error {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fiber.NewError(http.StatusForbidden, "Unexpected signing method")
 		}
-		return []byte(os.Getenv("JWT_SECRET")), nil
+		return am.JWTSecret, nil
 	})
 
 	if err != nil || !token.Valid {
